@@ -1,4 +1,4 @@
- #include <Wire.h>
+#include <Wire.h>
 
 #define ds3231   0x68
 #define ctrlReg  0x0E
@@ -14,7 +14,7 @@ void setup()
   Wire.endTransmission();
 }
 
-void loop() { 
-  ; 
+void loop() {
+  delay(1);
 }
 

@@ -43,7 +43,7 @@ void doTick() {
  
   // Energize the electromagnet in the correct direction.
   digitalWrite(tickPin, HIGH);
-  delay(75);
+  delay(40 );
   digitalWrite(tickPin, LOW);  
  
   // Switch the direction so it will fire in the opposite way next time.
