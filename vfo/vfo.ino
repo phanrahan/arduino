@@ -4,6 +4,7 @@
 // March 2014
 
 #include "U8glib.h"
+#include <Encoder.h>
 #include <DDS.h>
 
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_NO_ACK|U8G_I2C_OPT_FAST);
@@ -16,14 +17,15 @@ const int FQ_UD = 3;
 const int DATA = 4;
 const int RESET = 5;
 
-const int encoder0PinA = 6;
-const int encoder0PinB = 7;
+// Change these pin numbers to the pins connected to your encoder.
+//   Best Performance: both pins have interrupt capability
+//   Good Performance: only the first pin has interrupt capability
+//   Low Performance:  neither pin has interrupt capability
+Encoder knob(6, 7);
+int lastpos;
 
-int ALast;
-int BLast;
-
-double freq = 5000000;
-double dfreq = 100000;
+long freq = 5000000;
+long dfreq = 100000;
 
 // Instantiate the DDS...
 DDS dds(W_CLK, FQ_UD, DATA, RESET);
@@ -41,8 +43,7 @@ void setFrequency()
 
 
 void setup() {
-  DDRB|=0x21;        
-  PORTB |= 0x21;
+  lastpos = knob.read();
   
     // assign default color value
   if ( u8g.getMode() == U8G_MODE_R3G3B2 ) {
@@ -62,29 +63,16 @@ void setup() {
  
   dds.init();  
   dds.trim(124997000);   // (Optional) trim if your xtal is not at 125MHz...
-  
-  pinMode (encoder0PinA,INPUT);
-  pinMode (encoder0PinB,INPUT);
-  digitalWrite (encoder0PinA, HIGH);
-  digitalWrite (encoder0PinB, HIGH);
-  ALast = digitalRead(encoder0PinA);
-  BLast = digitalRead(encoder0PinB);
     
   setFrequency();
 }
 
 void loop() {
-  int A = digitalRead(encoder0PinA);
-  int B = digitalRead(encoder0PinB);
-  if (ALast != A || BLast != B) {
-     if (ALast ^ B) {
-       freq -= dfreq;
-     } 
-     else {
-       freq += dfreq;
-     }
-     ALast = A;
-     BLast = B;
+  int pos = knob.read();
+  
+  if( pos != lastpos ) {
+     freq += (pos - lastpos) * dfreq;
+     lastpos = pos;
      setFrequency();
   } 
 }
