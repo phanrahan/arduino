@@ -22,7 +22,12 @@ void loop()
       while( digitalRead(POWER) ) {
           int speed = analogRead(A2) - 512;
           md.setM1Speed(speed);
+          Serial.print("speed ");
           Serial.println(speed);
+          delay(500);
+          unsigned ma = md.getM1CurrentMilliamps();
+          Serial.print("current (mA) ");
+          Serial.println(ma);
           delay(500);
       }
       digitalWrite(4, LOW);
