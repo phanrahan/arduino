@@ -8,10 +8,6 @@ const int RESET = 5;
 
 DDS dds(W_CLK, FQ_UD, DATA, RESET);
 
-const int sfreq = 7300000;
-const int efreq = 7400000;
-const int dfreq =    1000;
-
 void setup() {
   Serial.begin(9600);
 
@@ -20,6 +16,10 @@ void setup() {
 }
 
 void loop() {
+  const int sfreq = 7300000;
+  const int efreq = 7400000;
+  const int dfreq =    1000;
+
   for( int freq = sfreq; freq < efreq; freq += dfreq ) {
       dds.setFrequency(freq);  
       int response = analogRead(A0);
@@ -27,6 +27,7 @@ void loop() {
       Serial.print(freq);
       Serial.print('response');
       Serial.print(response);
+      Serial.println();
       delay(10);
   }
 }
