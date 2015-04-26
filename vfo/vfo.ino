@@ -3,10 +3,9 @@
 // http://m0xpd.blogspot.com
 // March 2014
 
-#include <Bounce.h>
+#include <Bounce2.h>
 #include <Encoder.h>
-#include "U8glib.h"
-
+#include <U8glib.h>
 #include <DDS.h>
 
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_NO_ACK|U8G_I2C_OPT_FAST);
@@ -28,10 +27,10 @@ Encoder knob(6, 7);
 int lastpos;
 
 const int decrPin = 8;
-Bounce decrbutton = Bounce(decrPin, 10);  // 10 ms debounce
+Bounce decrbutton = Bounce();  // 10 ms debounce
 
 const int incrPin = 9;
-Bounce incrbutton = Bounce(incrPin, 10);  // 10 ms debounce
+Bounce incrbutton = Bounce();  // 10 ms debounce
 
 
 long freq = 5000000;
@@ -55,6 +54,10 @@ void setFrequency()
 void setup() {
   pinMode(incrPin, INPUT_PULLUP);
   pinMode(decrPin, INPUT_PULLUP);
+  incrbutton.attach(incrPin);
+  incrbutton.interval(10);
+  decrbutton.attach(decrPin);
+  decrbutton.interval(10);
   
   lastpos = knob.read();
   
@@ -82,7 +85,7 @@ void setup() {
 
 void loop() {
   if( incrbutton.update() ) {
-    if( incrbutton.risingEdge() ) {
+    if( incrbutton.read() ) {
       if (dfreq == 100) {
         dfreq = 1000;
       } 
@@ -99,7 +102,7 @@ void loop() {
   }
   
   if( decrbutton.update() ) {
-    if( decrbutton.risingEdge() ) {
+    if( decrbutton.read() ) {
       if (dfreq == 100) {
         dfreq = 100000;
       } 
