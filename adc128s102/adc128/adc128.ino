@@ -14,6 +14,7 @@ void setup()
  
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
+  SPI.setDataMode(SPI_MODE2)  // Mode=2 CPOL=1, CPHA=0
 }
 
 /*
