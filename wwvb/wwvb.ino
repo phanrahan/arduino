@@ -50,19 +50,18 @@
  *   LCD Display functions using LCD117 Serial LCD driver
  *************************************************************************************************/
 
-#include              // sprintf 2k penalty, abandon for Serial.print() if memory low 
+// #include <stdio,h>              // sprintf 2k penalty, abandon for Serial.print() if memory low 
 
 //Inputs
 #define wwvbRxPin      2       // WWVB receiver digital input
 #define utcSwitchPin   8       // Localtime/UTC selector switch digital input
 #define tz1SwitchPin   9       // TZ selector switch digital input
 #define tz2SwitchPin  10       // TZ selector switch digital input
-// #define tempSensorPin  5       // LM35 temperature sensor analog input
 //Outputs
 #define ledMarkPin   7         // LED mark indicator digital output
 #define ledFramePin  6         // LED frame indicator digitaloutput
 #define ledBitPin    5         // LED bit value indicator digital output
-#define ledRxPin     4         // LED indicator digital output
+#define ledRxPin     13        // LED indicator digital output
 //Constants
 #define WWVB_noise_millis 100  // Number of milliseconds before we assume noise     (100ms)
 #define WWVB_mark_millis  400  // Number of milliseconds before we assume a mark    (200ms)
@@ -188,12 +187,9 @@ void setup(void) {
   pinMode(utcSwitchPin, INPUT);  // set pin mode input
   pinMode(tz1SwitchPin, INPUT);  // set pin mode input
   pinMode(tz2SwitchPin, INPUT);  // set pin mode input
-  //lcdInit();                     // set lcd display mode, clear screen
   utcSwitchCheck();              // dip switch read during restart - display LocalTime/UTC
   tzSwitchCheck();               // dip switch read during restart - choose timezone to display
-  //getTemperature();              // read temperature from sensor
   wwvbInit();                    // initialize clock, ISR for time correction
-  //clearLCD();                    // clear display for output
 }
 
 /**********************************************************************************
@@ -202,12 +198,7 @@ void setup(void) {
 
 void loop(void) {
   if (ss != previousSecond) {    // upon seconds change
-    //if ((ss % 5) == 0) {         // every five seconds
-    //  getTemperature();          // read temperature sensor and compute temp degrees Celsus
-    //}
-    #ifndef DEBUG_DATASTRUC
     serialDumpTime();            // print date, time and temp to LCD
-    #endif
     previousSecond = ss;         // store previous second
   }
   if (wwvbSignalState != previousSignalState) {  // upon WWVB receiver signal change
@@ -312,6 +303,7 @@ void int0handler() {
  *******************************************************************************************************/
 
 void scanSignal(void){ 
+   Serial.println(errorCount);
    if (wwvbSignalState == 1) {             // see if receiver input signal is still high
       int thisFlankTime=millis();          // retrieve current time
       previousFlankTime=thisFlankTime;     // add time to count
@@ -434,44 +426,10 @@ void finalizeBuffer(void) {
 }
 
 
-#if 0
-// LCD routines to initialize LCD and clear screen
-void lcdInit() {           // using P H Anderson Serial LCD driver board
-  Serial.print("?G216");   // configure driver for 2 x 16 LCD
-  delay(300);
-  Serial.print("?BDD");    // set backlight brightness
-  delay(300);
-  Serial.print("?D00000000000001F1F");  // special character low bar
-  delay(300);
-  Serial.print("?D10000001F1F1F1F1F");  // special character half block
-  delay(300);
-  Serial.print("?D21F1F1F1F1F1F1F1F");  // special character full block
-  delay(300);
-  Serial.print("?D31C141C0000000000");  // special character degree symbol
-  delay(300);
-  Serial.print("?f");      // clear screen
-}
-
-void clearLCD() {
-  Serial.print("?x00?y0?f"); // movie cursor to line 1 char 1, clear screen
-  delay(300);
-}
-#endif
-
 // convert BCD to decimal numbers
 byte bcdToDec(byte val) {
   return ((val/16*10) + (val%16));
 }
-
-#if 0
-// read sensor value from LM35 temperature sensor and calculate temperature
-// replace sensor with LM34 for degrees Fahrenheit
-void getTemperature() {
-  int sensorValue;
-  sensorValue = analogRead(tempSensorPin);
-  calculatedTemperature = (5.0 * sensorValue * 100.0) / 1024.0;
-}
-#endif 
 
 // Dip Switch for UTC - read once on startup - polling messes up reading WWVB receive data 
 void utcSwitchCheck() {
@@ -498,36 +456,20 @@ void tzSwitchCheck() {
  ********************************************************************************************/
 
 void serialDumpTime(void) {
-  //int tempout;
-  //int tempoutd;
   char timeString[12];
   char dateString[12];
   char tempString[8];
-
-  //tempout = calculatedTemperature;
-  //tempoutd = ((calculatedTemperature - tempout) * 10);
     
   if (year == 0) {
     // Display "Aquiring Frame:" and bit count. At 60, frame is finished and clock should sync.
     // Count restarting or going over 60 indicates bad signal reception. Move receiver/antenna
     // to better location or try during more radio signal quiescent time of day.
-    //Serial.print("?x00?y0Acquiring Frame:");
-    //Serial.print("?x00?y1");
-    //Serial.print("?0?1?2");
-    //Serial.print("?x07?y1");
+    Serial.print("Acquiring Frame:");
     if (bitCount < 10) { Serial.print("0"); }
-    Serial.print(bitCount, DEC);
-    //Serial.print("?x13?y1");
-    //Serial.print("?2?1?0");
-    //Serial.print("?c0"); 
-
+    Serial.println(bitCount, DEC);
   } else {  
     // Hour, minutes and seconds
     // Flashing seconds colon
-#if 0
-    if (clockStarted == 0) { clearLCD(); }           // first time, clear display
-    Serial.print("?x00?y0");                         // cursor to row one, char 1
-#endif
 
     // calculate local time from offset and DST flag
     lhh = ((hh + dst + 24) - TZ[selectTZ][1]) % 24; // calculate local time
@@ -593,26 +535,27 @@ void serialDumpTime(void) {
     }
   
     Serial.print("?x00?y1");       // ANSI Standard YYYYMMDD Sortable date string
-#endif
+
     if (displayUTC == 1) {         // UTC can directly use month & day
-       sprintf(dateString, "%04d%02d%02d ", year, mon, day);
-       Serial.print(dateString);
+       //Serial.print(dateString, "%04d%02d%02d ", year, mon, day);
+       //Serial.print(dateString);
        // Display temperature in degrees Celsus
        //sprintf(tempString, "%3d.%1d?3C",  tempout, tempoutd);
        //Serial.print(tempString);
     } else if (lhh < dayxing) {    // Local time can use date info up to UTC date crossing
-       sprintf(dateString, "%04d%02d%02d ", year, mon, day);
-       Serial.print(dateString);
+       //Serial.printf(dateString, "%04d%02d%02d ", year, mon, day);
+       //Serial.print(dateString);
        // Display temperature in degrees Celsus
        //sprintf(tempString, "%3d.%1d?3C",  tempout, tempoutd);
        //Serial.print(tempString);
     } else {                       // Delay change of date till 00hrs local
-       sprintf(dateString, "%04d%02d%02d ", year, prevmon, prevday);
-       Serial.print(dateString);
+       //Serial.printf(dateString, "%04d%02d%02d ", year, prevmon, prevday);
+       //Serial.print(dateString);
        // Display temperature in degrees Celsus
        //sprintf(tempString, "%3d.%1d?3C",  tempout, tempoutd);
        //Serial.print(tempString);
     }
+#endif
     clockStarted = 1;
   }
 }

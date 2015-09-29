@@ -31,7 +31,6 @@ void setup() {
   output(0x0b, 0x07); //scan limit register - display digits 0 thru 7
   output(0x0a, 0x0f); //intensity register - max brightness
   output(0x09, 0xff); //decode mode register - CodeB decode all digits
-
   output(0x08, 0x0c); //digit 7 (leftmost digit) data
   output(0x07, 0x0b);
   output(0x06, 0x0d);
