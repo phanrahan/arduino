@@ -1,4 +1,5 @@
-// Demonstrate use of the DDS Library
+
+ // Demonstrate use of the DDS Library
 // m0xpd
 // http://m0xpd.blogspot.com
 // March 2014
@@ -74,7 +75,7 @@ void setup() {
   else if ( u8g.getMode() == U8G_MODE_HICOLOR ) {
     u8g.setHiColorByRGB(255,255,255);
   }
-  u8g.setFont(u8g_font_unifont);
+  u8g.setFont(u8g_font_profont22);
   u8g.setRot180();
  
   dds.init();  
@@ -96,19 +97,19 @@ void loop() {
         dfreq = 100000;   
       }
       else if (dfreq == 100000) {
-        dfreq = 100;   
+        dfreq = 1000000;   
       }
     }
   }
   
   if( decrbutton.update() ) {
     if( decrbutton.read() ) {
-      if (dfreq == 100) {
+      if (dfreq == 1000000) {
         dfreq = 100000;
       } 
       else if (dfreq == 100000) {
-        dfreq = 10000;
-      } 
+        dfreq = 10000;   
+      }
       else if (dfreq == 10000) {
         dfreq = 1000;   
       }

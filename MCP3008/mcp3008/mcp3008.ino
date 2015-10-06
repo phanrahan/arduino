@@ -16,7 +16,7 @@
 
 SPISettings MCP3008(2000000, MSBFIRST, SPI_MODE0);
 
-const int  CS_MCP3008       = 4;          // ADC Chip Select
+const int  CS_MCP3008       = 10;          // ADC Chip Select
 const byte adc_single_ch0   = (0x08);     // ADC Channel 0
 const byte adc_single_ch1   = (0x09);     // ADC Channel 1
 const byte adc_single_ch2   = (0x0A);     // ADC Channel 2
@@ -45,7 +45,9 @@ void loop()
   double vRef        = 4.91;
   int    adc_reading = 0;
 
-  adc_reading        = adc_single_channel_read (adc_single_ch7);
+  adc_reading        = adc_single_channel_read (adc_single_ch0
+  
+  );
 
   Serial.print       ("ADC Ch ");
   Serial.print       (adc_single_ch7 & 0x07);
