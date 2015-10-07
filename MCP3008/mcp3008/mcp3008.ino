@@ -45,12 +45,10 @@ void loop()
   double vRef        = 4.91;
   int    adc_reading = 0;
 
-  adc_reading        = adc_single_channel_read (adc_single_ch0
-  
-  );
+  adc_reading        = adc_single_channel_read (adc_single_ch0 );
 
   Serial.print       ("ADC Ch ");
-  Serial.print       (adc_single_ch7 & 0x07);
+  Serial.print       (adc_single_ch0 & 0x07);
   Serial.print       (" Voltage: ");
   Serial.println     ((adc_reading * vRef) / 1024, 2);
 
