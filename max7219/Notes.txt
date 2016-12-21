@@ -1,0 +1,65 @@
+//the opcodes for the MAX7221 and MAX7219
+#define OP_NOOP   0
+#define OP_DIGIT0 1
+#define OP_DIGIT1 2 
+#define OP_DIGIT2 3 
+#define OP_DIGIT3 4 
+#define OP_DIGIT4 5
+#define OP_DIGIT5 6
+#define OP_DIGIT6 7
+#define OP_DIGIT7 8
+#define OP_DECODEMODE  9
+#define OP_INTENSITY   10
+#define OP_SCANLIMIT   11
+#define OP_SHUTDOWN    12
+#define OP_DISPLAYTEST 15
+
+// Put values in arrays
+byte invader1a[] =
+{
+   B00011000,  // First frame of invader #1
+   B00111100,
+   B01111110,
+   B11011011,
+   B11111111,
+   B00100100,
+   B01011010,
+   B10100101
+};
+ 
+byte invader1b[] =
+{
+  B00011000, // Second frame of invader #1
+  B00111100,
+  B01111110,
+  B11011011,
+  B11111111,
+  B00100100,
+  B01011010,
+  B01000010
+};
+ 
+byte invader2a[] =
+{
+  B00100100, // First frame of invader #2
+  B00100100,
+  B01111110,
+  B11011011,
+  B11111111,
+  B11111111,
+  B10100101,
+  B00100100
+};
+ 
+byte invader2b[] =
+{
+  B00100100, // Second frame of invader #2
+  B10100101,
+  B11111111,
+  B11011011,
+  B11111111,
+  B01111110,
+  B00100100,
+  B01000010
+};
+

@@ -1,0 +1,10 @@
+Hamsterworks fpga implementation of the DX display
+  http://hamsterworks.co.nz/mediawiki/index.php/Dx_display
+
+Adafruit tutorial on using a MCP3008 with a Raspberry Pi
+  https://learn.adafruit.com/reading-a-analog-in-and-controlling-audio-volume-with-the-raspberry-pi
+
+  http://www.geeklee.co.uk/raspberry-pi-with-mcp3002/
+
+
+http://dorkbotpdx.org/blog/paul/spi_transactions_in_arduino
