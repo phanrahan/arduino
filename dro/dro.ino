@@ -10,11 +10,14 @@
  */
  void tickTock();
 
-int const clockPin = 2;
 
-int const xDataPin = 3;
-int const yDataPin = 4;
-int const zDataPin = 5;
+int const gnd = 8;
+int const vcc = 9;
+int const zDataPin = 10;
+int const yDataPin = 11;
+int const xDataPin = 12;
+int const clockPin = 13;
+
 
 //variables that will store the readout
 volatile long xCoord;
@@ -23,6 +26,11 @@ volatile long zCoord;
 
 void setup() {         
 
+  pinMode(vcc, OUTPUT); 
+  digitalWrite(vcc, HIGH);
+  pinMode(gnd, OUTPUT); 
+  digitalWrite(gnd, LOW);
+  
   //clock pin should be set as output  
   pinMode(clockPin, OUTPUT); 
   
@@ -82,6 +90,8 @@ void loop() {
   Serial.print("Z");
   Serial.print((long)zCoord); 
   Serial.print(";"); 
+
+  Serial.println();
   
   //give the scales time to become ready again
   delay(50);
