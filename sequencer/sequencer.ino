@@ -1,4 +1,4 @@
-#define STEPS 4
+#define STEPS 8
 const int note[] = { 2, 3, 4, 5, 6, 7, 8, 9 };
 const int run = 10;
 const int reset = 11;
