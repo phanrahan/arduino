@@ -1,0 +1,19 @@
+External power
+- used 12V ac adapter
+- plugged into power strip on breadboard
+- power cable from breadboard to Vin/9V on Arduino
+- set jumper to external power on Arduino NG (auto detects on Dec.)
+- can still download code over usb
+
+Stepper
+- ULN2804
+   Pin 0 -> Pin 8 Arduino
+   Pin 1 -> Pin 9 Arduino
+   Pin 2 -> Pin 10 Arduino
+   Pin 3 -> Pin 11 Arduino
+
+Reverse engineering the stepper motor cables
+   http://www.jasonbabcock.com/computing/breadboard/unipolar/index.html
+
+See Hobby/Mechanics/Stepper for more references
+

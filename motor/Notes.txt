@@ -1,0 +1,17 @@
+Use the motor shield with external power
+Power on to upload
+
+See http://mjo.tc/atelier/2009/02/arduino-cli.html to debug
+- this works with both the 169 anf 328p
+- not sure why Makefile.old doesn't work
+
+https://bugs.launchpad.net/arduino/+bug/529444
+  arduino bootloader doesn't implement all the stk500 protocol
+  method for getting device signatures is different
+  use arduino version of arvdude
+  use "arduino" as the programmer
+
+  test
+    does it work with arduino protocol instead of stk500v2 protocol
+    does it work with arduino avrdude vs. local avrdude
+
