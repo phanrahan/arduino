@@ -20,12 +20,11 @@
 #define LED_PIN    6
 
 // How many NeoPixels are attached to the Arduino?
-#define LED_COUNT 48
-
+#define LED_COUNT 60
 
 // Declare our NeoPixel strip object:
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-//Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_WRGB + NEO_KHZ800);
+//Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_RGBW + NEO_KHZ800);
 // Argument 1 = Number of pixels in NeoPixel strip
 // Argument 2 = Arduino pin number (most are valid)
 // Argument 3 = Pixel type flags, add together as needed:
@@ -56,9 +55,6 @@ void setup() {
 
 void loop() {
   // Fill along the length of the strip in various colors...
-  // G R G W
-  //colorWipe(strip.Color(0, 0,   0, 255), 50); // Red
-  
   colorWipe(strip.Color(255,   0,   0), 50); // Red
   colorWipe(strip.Color(  0, 255,   0), 50); // Green
   colorWipe(strip.Color(  0,   0, 255), 50); // Blue
@@ -70,7 +66,6 @@ void loop() {
 
   rainbow(10);             // Flowing rainbow cycle along the whole strip
   theaterChaseRainbow(50); // Rainbow-enhanced theaterChase variant
-  
 }
 
 
