@@ -12,6 +12,8 @@ int const INA = 12;
 //  Motor B
 int const ENB = 11;  
 int const INB = 13;
+//  Throttle
+int const THROTTLE = A2;
 
 int const MIN_SPEED = 27;   // Set to minimum PWM value that will make motors turn
 
@@ -27,7 +29,7 @@ void setup()
 
 void loop()
 {
-  int speed = (analogRead(A2) - 512) / 2;
+  int speed = (analogRead(THROTTLE) - 512) / 2;
   int direction = speed < 0 ? 'R' : 'F';
   if( speed < 0 )
       speed = -speed;
