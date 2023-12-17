@@ -56,7 +56,7 @@ void Motor(char mot, char dir, int speed)
         digitalWrite(INA, HIGH);
       }
       else if (dir == 'R') {
-        digitalWrite(INB, LOW);
+        digitalWrite(INA, LOW);
       }
       analogWrite(ENA, speed);
       break;
