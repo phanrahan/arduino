@@ -1,0 +1,1 @@
+ampy --port /dev/cu.usbmodem14101 run test.py
