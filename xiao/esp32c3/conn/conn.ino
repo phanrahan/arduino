@@ -2,6 +2,7 @@
 
 const char* ssid     = "Wifihill";
 const char* password = "Wifihill";   
+const char* hostname = "esp32c3";
 
 void setup()
 {
@@ -15,6 +16,9 @@ void setup()
     Serial.print("Connecting to ");
     Serial.println(ssid);
 
+    WiFi.mode(WIFI_STA);
+    WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+    WiFi.setHostname(hostname);
     WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED) {
