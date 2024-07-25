@@ -106,7 +106,7 @@ void iopins(void) {
 int bootbtn = 0;
 
 void setup() {
-  Serial.begin();
+  Serial.begin(115200);
   delay(2000); // 2 second delay should be sufficient for USB-CDC
   Serial.println("\n\nList ESP32C3 based board I/O pin names and numbers");
 
