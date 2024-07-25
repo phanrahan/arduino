@@ -3,7 +3,7 @@ import time
 led_pin = 10  
 
 led = Pin(led_pin, Pin.OUT)
-for i in range(10):
+while 1:
   led.on()
   time.sleep_ms(500)
   led.off()
