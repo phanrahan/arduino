@@ -76,21 +76,22 @@ void respond(WiFiClient& client) {
   client.println("Content-type:text/html");
   client.println("Connection: close");
   client.println();
-  client.println("<!DOCTYPE html><html>");
-  client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-  client.println("<link rel=\"icon\" href=\"data:,\">");
-  client.print("<body><p>");
-  client.print(hostname);
-  client.println("</p>");
-  //client.print("<p>Input is ");
-  //client.print(digitalRead(pinIn) ? "on" : "off");
-  client.println(".</p>");
-  client.print("<p>Output is ");
-  client.print(outValue ? "on" : "off");
-  client.println(".</p>");
-  client.println("<p><a href=\"/turnoff\">Turn output off.</a></p>");
-  client.println("<p><a href=\"/turnon\">Turn output on.</a></p>");
-  client.println("</body></html>");
+  client.println("<!DOCTYPE html>");
+  client.println("<html>");
+  client.println("<head>");
+    client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+  client.println("</head>");
+  client.println("<body>");
+    client.println("<p>");
+      client.println(hostname);
+    client.println("</p>");
+    client.println("<p>LED (D10) is ");
+      client.println(outValue ? "on" : "off");
+    client.println("</p>");
+    client.println("<p><a href=\"/turnoff\">Turn LED off.</a></p>");
+    client.println("<p><a href=\"/turnon\">Turn LED on.</a></p>");
+  client.println("</body>");
+  client.println("</html>");
   client.println();  // End response with blank line.
 }
 
