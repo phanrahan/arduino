@@ -22,7 +22,8 @@ void setup() {
 
   // Connect to WiFi.
   Serial.println("Connecting to " + ssid + " as " + hostname);
-  WiFi.config(ip); // Force this static IP address.
+  WiFi.mode(WIFI_STA);
+  WiFi.config(ip);  // Force this static IP address.
   WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -39,12 +40,12 @@ void setup() {
 
 void loop() {
   WiFiClient client = server.available();
-  if (! client) {
+  if (!client) {
     printDot();
   } else {
     Serial.println("\nNew Client.");
 
-    while (client.connected() && client.available()) { 
+    while (client.connected() && client.available()) {
       // Get request.
       Serial.println("Read string");
       const String s = client.readString();
@@ -78,8 +79,8 @@ void respond(WiFiClient& client) {
   client.println("<!DOCTYPE html><html>");
   client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
   client.println("<link rel=\"icon\" href=\"data:,\">");
-  client.print("<body><p>"); 
-  client.print(hostname); 
+  client.print("<body><p>");
+  client.print(hostname);
   client.println("</p>");
   //client.print("<p>Input is ");
   //client.print(digitalRead(pinIn) ? "on" : "off");
@@ -90,7 +91,7 @@ void respond(WiFiClient& client) {
   client.println("<p><a href=\"/turnoff\">Turn output off.</a></p>");
   client.println("<p><a href=\"/turnon\">Turn output on.</a></p>");
   client.println("</body></html>");
-  client.println(); // End response with blank line.
+  client.println();  // End response with blank line.
 }
 
 void printDot() {
