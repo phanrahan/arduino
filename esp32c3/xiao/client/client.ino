@@ -4,7 +4,8 @@
 const char* ssid = "Wifihill";
 const char* password = "Wifihill";
 
-const char* serverName = "https://192.168.1.2/sensor/";
+// nit
+const char* serverName = "https://10.0.0.132:8000/sensor/";
 
 unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
