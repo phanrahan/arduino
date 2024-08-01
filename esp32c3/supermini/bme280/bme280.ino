@@ -91,10 +91,10 @@ void respond_html(WiFiClient& client) {
     client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
   client.println("</head>");
   client.println("<body>");
-    client.printf("<p>Temperature %d C </p>\n", temperature);
-    client.printf("<p>Pressure %d Pa </p>\n", pressure);
-    client.printf("<p>Humidity %d %% </p>\n", humidity);
-    client.printf("<p>Altitude %d m </p>\n", altitude);
+    client.printf("<p>Temperature %dC</p>\n", temperature);
+    client.printf("<p>Pressure %dhPa</p>\n", pressure/100);  // 1 hectopascal (hPa) equals 100 Pa, which equals 1 millibar.
+    client.printf("<p>Humidity %d%%</p>\n", humidity);
+    client.printf("<p>Altitude %dm</p>\n", altitude);
   client.println("</body>");
   client.println("</html>");
   client.println();  // End response with blank line.
