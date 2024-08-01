@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include "ArduinoJson.h"
 
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
@@ -98,6 +99,23 @@ void respond_html(WiFiClient& client) {
   client.println("</body>");
   client.println("</html>");
   client.println();  // End response with blank line.
+}
+
+void respond_json(WiFiClient& client) {
+  client.println("HTTP/1.1 200 OK");
+  client.println("Content-type: application/json");
+  //client.println("Content-length: 19");
+  client.println("Connection: close");
+  client.println();
+  //client.println("{\"success\":\"true\"}");
+  StaticJsonDocument<200> data;
+  data["temperature"] = temperature;
+  data["pressure"] = pressure;
+  data["humidity"] = humidity;
+  data["altitude"] = altitude;
+  String response;
+  serializeJson(data, response);
+  client.println(response);
 }
 
 void printDot() {
