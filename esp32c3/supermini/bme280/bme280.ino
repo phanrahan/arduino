@@ -7,6 +7,10 @@
 #define SEALEVELPRESSURE_HPA (1013.25)
 
 Adafruit_BME280 bme; // I2C
+int temperature;
+int pressure;
+int humidity;
+int altitude;
 
 const String ssid("Wifihill");
 const String password("Wifihill");
@@ -56,7 +60,7 @@ void loop() {
       Serial.print(s);
 
       processRequest(s);
-      respond(client);
+      respond_html(client);
     }
 
     // Disconnect.
@@ -65,17 +69,21 @@ void loop() {
   }
 }
 
-void processRequest(const String& s) {
+void read_bme() {
+  temperature = bme.readTemperature();
+  pressure = bme.readPressure();
+  humidity = bme.readHumidity();
+  altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
 }
 
-void respond(WiFiClient& client) {
-  int temperature = bme.readTemperature();
-  int pressure = bme.readPressure();
-  int humidity = bme.readHumidity();
-  int altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+void processRequest(const String& s) {
+  read_bme();
+}
+
+void respond_html(WiFiClient& client) {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-type:text/html");
-  client.println("Connection: close");
+  client.println("Connection: close"); // default in HTTP 1.1 is open
   client.println();
   client.println("<!DOCTYPE html>");
   client.println("<html>");
@@ -83,23 +91,10 @@ void respond(WiFiClient& client) {
     client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
   client.println("</head>");
   client.println("<body>");
-    client.println("<p>Temperature ");
-      client.print(temperature);
-      client.println("C");
-    client.println("</p>");
-    client.println("<p>Pressure ");
-      client.print(pressure);
-      client.println("Pa");
-    client.println("</p>");
-        client.println("<p>Humidity ");
-      client.print(humidity);
-      client.println("%");
-    client.println("</p>");
-    client.println("</p>");
-        client.println("<p>Altitude ");
-      client.print(altitude);
-      client.println("m");
-    client.println("</p>");
+    client.printf("<p>Temperature %d C </p>\n", temperature);
+    client.printf("<p>Pressure %d Pa </p>\n", pressure);
+    client.printf("<p>Humidity %d %% </p>\n", humidity);
+    client.printf("<p>Altitude %d m </p>\n", altitude);
   client.println("</body>");
   client.println("</html>");
   client.println();  // End response with blank line.
