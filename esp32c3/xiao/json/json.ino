@@ -74,6 +74,7 @@ void processRequest(const String& s) {
 void respond(WiFiClient& client) {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-type: application/json");
+  client.println("Content-length: 19");
   client.println("Connection: close");
   client.println();
   client.println("{\"success\":\"true\"}");
