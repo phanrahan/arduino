@@ -5,13 +5,10 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-#define SEALEVELPRESSURE_HPA (1013.25)
-
 Adafruit_BME280 bme; // I2C
 int temperature;
 int pressure;
 int humidity;
-int altitude;
 
 const String ssid("Wifihill");
 const String password("Wifihill");
@@ -75,7 +72,6 @@ void read_bme() {
   temperature = bme.readTemperature();
   pressure = bme.readPressure();
   humidity = bme.readHumidity();
-  altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
 }
 
 void processRequest(const String& s) {
@@ -96,7 +92,6 @@ void respond_html(WiFiClient& client) {
     client.printf("<p>Temperature %dC</p>\n", temperature);
     client.printf("<p>Pressure %dhPa</p>\n", pressure/100);  // 1 hectopascal (hPa) equals 100 Pa, which equals 1 millibar.
     client.printf("<p>Humidity %d%%</p>\n", humidity);
-    client.printf("<p>Altitude %dm</p>\n", altitude);
   client.println("</body>");
   client.println("</html>");
   client.println();  // End response with blank line.
@@ -113,7 +108,6 @@ void respond_json(WiFiClient& client) {
   data["temperature"] = temperature;
   data["pressure"] = pressure;
   data["humidity"] = humidity;
-  data["altitude"] = altitude;
   String response;
   serializeJson(data, response);
   client.println(response);
