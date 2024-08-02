@@ -61,7 +61,8 @@ void loop() {
       Serial.print(s);
 
       processRequest(s);
-      respond_html(client);
+      //respond_html(client);
+      respond_json(client);
     }
 
     // Disconnect.
