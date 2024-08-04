@@ -1,30 +1,25 @@
+#include <HardwareSerial.h>
 #include <WiFi.h>
 #include "ArduinoJson.h"
 
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
-
-Adafruit_BME280 bme; // I2C
-int temperature;
-int pressure;
-int humidity;
+#define ESP32
+#include <SDS011.h>
 
 const String ssid("Wifihill");
 const String password("Wifihill");
-const IPAddress ip(10, 0, 0, 243);
-//const char* const hostname("esp32c3");
+const IPAddress ip(10, 0, 0, 244);
 
 WiFiServer server(80);
+
+HardwareSerial uart0(0);
+
+SDS011 sds;
+float p10, p25;
 
 void setup() {
   Serial.begin(115200);
 
-  bool status = bme.begin();  
-  if (!status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
-  }
+  sds.begin(&uart0, RX, TX);
 
   // Connect to WiFi.
   Serial.println("Connecting to " + ssid);
@@ -37,7 +32,6 @@ void setup() {
     Serial.print(".");
   }
   Serial.println();
-  //Serial.print("WiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
 
   // Initialize WiFi server.
@@ -68,14 +62,10 @@ void loop() {
   }
 }
 
-void read_bme() {
-  temperature = bme.readTemperature();
-  pressure = bme.readPressure();
-  humidity = bme.readHumidity();
-}
-
 void processRequest(const String& s) {
-  read_bme();
+	int err = sds.read(&p25, &p10);
+  if( err )
+    Serial.println("SDS011 read error");
 }
 
 void respond_html(WiFiClient& client) {
@@ -89,9 +79,8 @@ void respond_html(WiFiClient& client) {
     client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
   client.println("</head>");
   client.println("<body>");
-    client.printf("<p>Temperature %dC</p>\n", temperature);
-    client.printf("<p>Pressure %dhPa</p>\n", pressure/100);  // 1 hectopascal (hPa) equals 100 Pa, which equals 1 millibar.
-    client.printf("<p>Humidity %d%%</p>\n", humidity);
+    client.printf("<p>p10 %fC</p>\n", p10);
+    client.printf("<p>p25 %fC</p>\n", p25);
   client.println("</body>");
   client.println("</html>");
   client.println();  // End response with blank line.
@@ -100,14 +89,11 @@ void respond_html(WiFiClient& client) {
 void respond_json(WiFiClient& client) {
   client.println("HTTP/1.1 200 OK");
   client.println("Content-type: application/json");
-  //client.println("Content-length: 19");
   client.println("Connection: close");
   client.println();
-  //client.println("{\"success\":\"true\"}");
   StaticJsonDocument<200> data;
-  data["temperature"] = temperature;
-  data["pressure"] = pressure;
-  data["humidity"] = humidity;
+  data["p10"] = p10;
+  data["p25"] = p25;
   String response;
   serializeJson(data, response);
   client.println(response);
