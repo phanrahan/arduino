@@ -1,3 +1,10 @@
+- python sds
+	- https://github.com/ikalchev/py-sds011
+	- git clone py-sds011.py
+	- pip install -e .
+	- python sds.py - WORKS
+      - note fan control
+
 There’s actually three UART devices on this board!
 
 The USB CDC Serial-overUSB, and two hardware UART devices.
