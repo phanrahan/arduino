@@ -19,7 +19,10 @@ float p10, p25;
 void setup() {
   Serial.begin(115200);
 
-  sds.begin(&uart0, RX, TX);
+  sds.begin(&uart0);
+  //sds.begin(&uart0, RX, TX);
+  //sds.wakeup();
+  //sds.continuous_mode();
 
   // Connect to WiFi.
   Serial.println("Connecting to " + ssid);
