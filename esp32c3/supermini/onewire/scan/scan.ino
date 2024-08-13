@@ -11,6 +11,7 @@ OneWire  ds(10);  // on pin 10 (a 4.7K resistor is necessary)
 
 void setup(void) {
   Serial.begin(115200);
+  Serial.println("Scanning for onewire devices");
 }
 
 void loop(void) {
@@ -24,7 +25,7 @@ void loop(void) {
     Serial.println("No more addresses.");
     Serial.println();
     ds.reset_search();
-    delay(250);
+    delay(2000);
     return;
   }
   
@@ -40,20 +41,28 @@ void loop(void) {
   }
   Serial.println();
  
-  // the first ROM byte indicates which chip
+  // the first ROM byte indicates chip family
   switch (addr[0]) {
     case 0x10:
-      Serial.println("  Chip = DS18S20");  // or old DS1820
+      Serial.println("  DS18S20 Temperature");  // or old DS1820
       break;
     case 0x28:
-      Serial.println("  Chip = DS18B20");
+      Serial.println("  DS18B20 Temperature");
       break;
     case 0x22:
-      Serial.println("  Chip = DS1822");
+      Serial.println("  DS1822 Temperature");
+      break;
+    case 0x1D:
+      Serial.println("  DS2423 Dual Counter");
+      break;
+    case 0x26:
+      Serial.println("  DS2438 Battery Monitor");
+      break;
+    case 0x20:
+      Serial.println("  DS2450 Quad ADC");
       break;
     default:
       Serial.println("  Unrecognizable device.");
       return;
-  } 
-
+  }
 }
