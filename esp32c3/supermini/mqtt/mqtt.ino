@@ -1,114 +1,102 @@
-/*********
-  Rui Santos
-  Complete project details at https://randomnerdtutorials.com  
-*********/
-
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <Wire.h>
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
 
-// Replace the next variables with your SSID/Password combination
 const char* ssid = "Wifihill";
 const char* password = "Wifihill";
+char hostname[20];
 
-// Add your MQTT Broker IP address, example:
-//const char* mqtt_server = "192.168.1.144";
-const char* mqtt_server = "10.0.0.38";
+// MQTT Broker IP address
+const char* mqtt_broker = "10.0.0.38"; // fiasco static ip
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-long lastMsg = 0;
-char msg[50];
-int value = 0;
+
+int lastMsg;
+#define INTERVAL 10000
 
 Adafruit_BME280 bme; // I2C
 
-float temperature = 0;
-float humidity = 0;
+
+void create_hostname() {
+  byte mac[6];
+  WiFi.macAddress(mac);
+  sprintf(hostname, "esp32c3-%02X%02X%02X", mac[3], mac[4], mac[5]);
+  Serial.printf("Hostname %s\n", hostname);
+}
 
 void setup() {
   Serial.begin(115200);
 
   if (!bme.begin(0x77)) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    Serial.println("Could not find a valid BME280 sensor ...");
     while (1);
   }
+
+  create_hostname();
+
   setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+
+  setup_mqtt();
 }
 
 void setup_wifi() {
   delay(10);
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
+  
+  Serial.printf("Connecting to %s\n", ssid);
+  WiFi.mode(WIFI_STA);
+  WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
-
+  
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 }
 
-void callback(char* topic, byte* message, unsigned int length) {
+void setup_mqtt() {
+  client.setServer(mqtt_broker, 1883);
 }
 
-void reconnect() {
-  // Loop until we're reconnected
+void connect_mqtt() {
   while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
-    if (client.connect("ESP32Client")) {
+    Serial.printf("Connecting to MQTT broker %s as client %s ...", mqtt_broker, hostname);
+    if (client.connect(hostname)) {
       Serial.println("connected");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
       delay(5000);
     }
   }
 }
+
+void publishf(char *topic, float value) {
+    char buf[8];
+    dtostrf(value, 1, 2, buf);
+    Serial.printf("%s %s\n", topic, buf);
+    client.publish(topic, buf);
+}
+
 void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
+  connect_mqtt();
   client.loop();
 
   long now = millis();
-  if (now - lastMsg > 5000) {
+  if (now - lastMsg > INTERVAL) {
     lastMsg = now;
     
-    // Temperature in Celsius
-    temperature = bme.readTemperature();   
-    // Uncomment the next line to set temperature in Fahrenheit 
-    // (and comment the previous temperature line)
-    //temperature = 1.8 * bme.readTemperature() + 32; // Temperature in Fahrenheit
-    
-    // Convert the value to a char array
-    char tempString[8];
-    dtostrf(temperature, 1, 2, tempString);
-    Serial.print("Temperature: ");
-    Serial.println(tempString);
-    client.publish("esp32/temperature", tempString);
+    float temperature = bme.readTemperature();   
+    temperature = 1.8 * temperature + 32; // Temperature in Fahrenheit
+    publishf("exp32/temperature", temperature);
 
-    humidity = bme.readHumidity();
-    
-    // Convert the value to a char array
-    char humString[8];
-    dtostrf(humidity, 1, 2, humString);
-    Serial.print("Humidity: ");
-    Serial.println(humString);
-    client.publish("esp32/humidity", humString);
+    float humidity = bme.readHumidity();
+    publishf("exp32/hunidity", humidity);
   }
 }
