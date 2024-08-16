@@ -9,16 +9,18 @@ const char* password = "Wifihill";
 char hostname[20];
 
 // MQTT Broker IP address
-const char* mqtt_broker = "10.0.0.38"; // fiasco static ip
+const char* mqtt_broker = "10.0.0.38";  // fiasco static ip
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-int lastMsg;
-#define INTERVAL 10000
+// 10 m
+#define INTERVAL 10*60
 
-Adafruit_BME280 bme; // I2C
+char *location = "minoca";
+char *room = "studio";
 
+Adafruit_BME280 bme;  // I2C
 
 void create_hostname() {
   byte mac[6];
@@ -30,32 +32,35 @@ void create_hostname() {
 void setup() {
   Serial.begin(115200);
 
-  if (!bme.begin(0x77)) {
-    Serial.println("Could not find a valid BME280 sensor ...");
-    while (1);
-  }
+  setup_sensor();
 
   create_hostname();
 
   setup_wifi();
 
   setup_mqtt();
+
+  publish_sensor();
+
+  delay(1000); // wait for mqtt message to be sent
+  
+  Serial.println("going into deep sleep");
+  ESP.deepSleep(INTERVAL * 1000000);
 }
 
 void setup_wifi() {
   delay(10);
-  
+
   Serial.printf("Connecting to %s\n", ssid);
   WiFi.mode(WIFI_STA);
   WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
 
-  Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 }
 
@@ -77,26 +82,34 @@ void connect_mqtt() {
   }
 }
 
-void publishf(char *topic, float value) {
-    char buf[8];
-    dtostrf(value, 1, 2, buf);
-    Serial.printf("%s %s\n", topic, buf);
-    client.publish(topic, buf);
+void publishf(char* location, char *room, char *sensor, float value) {
+  char topic[100];
+  char buf[8];
+  dtostrf(value, 1, 2, buf);
+  sprintf(topic, "%s/%s/%s", location, room, sensor);
+  Serial.printf("%s %s\n", topic, buf);
+  client.publish(topic, buf);
 }
 
-void loop() {
+void publish_sensor() {
   connect_mqtt();
   client.loop();
 
-  long now = millis();
-  if (now - lastMsg > INTERVAL) {
-    lastMsg = now;
-    
-    float temperature = bme.readTemperature();   
-    temperature = 1.8 * temperature + 32; // Temperature in Fahrenheit
-    publishf("exp32/temperature", temperature);
+  float temperature = bme.readTemperature();
+  temperature = 1.8 * temperature + 32;  // Temperature in Fahrenheit
+  publishf(location, room, "temperature", temperature);
 
-    float humidity = bme.readHumidity();
-    publishf("exp32/hunidity", humidity);
+  float humidity = bme.readHumidity();
+  publishf(location, room, "humidity", humidity);
+}
+
+void setup_sensor() {
+  if (!bme.begin(0x77)) {
+    Serial.println("Could not find a valid BME280 sensor ...");
+    while (1)
+      ;
   }
+}
+
+void loop() {
 }
