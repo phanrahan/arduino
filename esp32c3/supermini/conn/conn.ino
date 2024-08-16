@@ -15,15 +15,15 @@ void setup()
     Serial.begin(115200);
     delay(10);
 
-    create_hostname();
+    //create_hostname();
 
     Serial.println();
-    Serial.printf("Connecting to %s as %s\n", ssid, hostname);
-    Serial.println(ssid);
+    Serial.printf("Connecting to %s\n", ssid);
+    //Serial.printf("Connecting to %s as %s\n", ssid, hostname);
 
-    WiFi.mode(WIFI_STA);
-    WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
-    WiFi.setHostname(hostname);
+    //WiFi.mode(WIFI_STA);
+    //WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+    //WiFi.setHostname(hostname);
     WiFi.begin(ssid, password);
 
     while (WiFi.status() != WL_CONNECTED) {
