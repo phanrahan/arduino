@@ -1,114 +1,111 @@
-#include <HardwareSerial.h>
 #include <WiFi.h>
-#include "ArduinoJson.h"
-
-#define ESP32
+#include <PubSubClient.h>
+#include <HardwareSerial.h>
 #include <SDS011.h>
 
-const String ssid("Wifihill");
-const String password("Wifihill");
-const IPAddress ip(10, 0, 0, 244);
+const char* ssid = "Wifihill";
+const char* password = "Wifihill";
+char hostname[20];
 
-WiFiServer server(80);
+// MQTT Broker IP address
+const char* mqtt_broker = "10.0.0.38";  // fiasco static ip
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+// 10 m
+#define INTERVAL 10*60
+
+char *location = "minoca";
+char *room = "shop";
 
 HardwareSerial uart0(0);
 
 SDS011 sds;
-float p10, p25;
+
+void create_hostname() {
+  byte mac[6];
+  WiFi.macAddress(mac);
+  sprintf(hostname, "esp32c3-%02X%02X%02X", mac[3], mac[4], mac[5]);
+  Serial.printf("Hostname %s\n", hostname);
+}
 
 void setup() {
   Serial.begin(115200);
 
-  sds.begin(&uart0);
-  //sds.begin(&uart0, RX, TX);
-  //sds.wakeup();
-  //sds.continuous_mode();
+  setup_sensor();
 
-  // Connect to WiFi.
-  Serial.println("Connecting to " + ssid);
+  create_hostname();
+
+  setup_wifi();
+
+  setup_mqtt();
+
+  publish_sensor();
+
+  delay(1000); // wait for mqtt message to be sent
+  
+  Serial.println("going into deep sleep");
+  ESP.deepSleep(INTERVAL * 1000000);
+}
+
+void setup_wifi() {
+  delay(10);
+
+  Serial.printf("\nConnecting to %s\n", ssid);
   WiFi.mode(WIFI_STA);
-  WiFi.config(ip);  // Force this static IP address.
-  //WiFi.setHostname(hostname);
+  WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println();
-  Serial.println(WiFi.localIP());
 
-  // Initialize WiFi server.
-  server.begin();
+  Serial.println(WiFi.localIP());
+}
+
+void setup_mqtt() {
+  client.setServer(mqtt_broker, 1883);
+}
+
+void connect_mqtt() {
+  while (!client.connected()) {
+    Serial.printf("Connecting to MQTT broker %s as client %s ...", mqtt_broker, hostname);
+    if (client.connect(hostname)) {
+      Serial.println("connected");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      delay(5000);
+    }
+  }
+}
+
+void publishf(char* location, char *room, char *sensor, float value) {
+  char topic[100];
+  char buf[8];
+  dtostrf(value, 1, 2, buf);
+  sprintf(topic, "%s/%s/%s", location, room, sensor);
+  Serial.printf("%s %s\n", topic, buf);
+  client.publish(topic, buf);
+}
+
+void publish_sensor() {
+  connect_mqtt();
+  client.loop();
+
+  float p25, p10;
+  if( !sds.read(&p25, &p10) ) {
+      publishf(location, room, "p10", p10);
+      publishf(location, room, "p25", p25);
+  }
+}
+
+void setup_sensor() {
+  sds.begin(&uart0);
 }
 
 void loop() {
-  WiFiClient client = server.available();
-  if (!client) {
-    printDot();
-  } else {
-    Serial.println("\nNew Client.");
-
-    while (client.connected() && client.available()) {
-      // Get request.
-      Serial.println("Read string");
-      const String s = client.readString();
-      Serial.print(s);
-
-      processRequest(s);
-      //respond_html(client);
-      respond_json(client);
-    }
-
-    // Disconnect.
-    client.stop();
-    Serial.println("Client disconnected");
-  }
-}
-
-void processRequest(const String& s) {
-	int err = sds.read(&p25, &p10);
-  if( err )
-    Serial.println("SDS011 read error");
-}
-
-void respond_html(WiFiClient& client) {
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-type:text/html");
-  client.println("Connection: close"); // default in HTTP 1.1 is open
-  client.println();
-  client.println("<!DOCTYPE html>");
-  client.println("<html>");
-  client.println("<head>");
-    client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-  client.println("</head>");
-  client.println("<body>");
-    client.printf("<p>p10 %fC</p>\n", p10);
-    client.printf("<p>p25 %fC</p>\n", p25);
-  client.println("</body>");
-  client.println("</html>");
-  client.println();  // End response with blank line.
-}
-
-void respond_json(WiFiClient& client) {
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-type: application/json");
-  client.println("Connection: close");
-  client.println();
-  StaticJsonDocument<200> data;
-  data["p10"] = p10;
-  data["p25"] = p25;
-  String response;
-  serializeJson(data, response);
-  client.println(response);
-}
-
-void printDot() {
-  static int loopCount = 0;
-  delay(200);
-  Serial.print(".");
-  loopCount += 1;
-  if (loopCount >= 80) {
-    loopCount = 0;
-    Serial.println("");
-  }
 }
