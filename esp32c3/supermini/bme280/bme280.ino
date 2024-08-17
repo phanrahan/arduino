@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include <Wire.h>
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
 
@@ -18,7 +17,8 @@ PubSubClient client(espClient);
 #define INTERVAL 10*60
 
 char *location = "minoca";
-char *room = "studio";
+//char *room = "studio";
+char *room = "bedroom";
 
 Adafruit_BME280 bme;  // I2C
 
@@ -26,39 +26,19 @@ void create_hostname() {
   byte mac[6];
   WiFi.macAddress(mac);
   sprintf(hostname, "esp32c3-%02X%02X%02X", mac[3], mac[4], mac[5]);
-  Serial.printf("Hostname %s\n", hostname);
-}
-
-void setup() {
-  Serial.begin(115200);
-
-  setup_sensor();
-
-  create_hostname();
-
-  setup_wifi();
-
-  setup_mqtt();
-
-  publish_sensor();
-
-  delay(1000); // wait for mqtt message to be sent
-  
-  Serial.println("going into deep sleep");
-  ESP.deepSleep(INTERVAL * 1000000);
 }
 
 void setup_wifi() {
-  delay(10);
-
-  Serial.printf("Connecting to %s\n", ssid);
+  Serial.printf("Connecting to %s as %s\n", ssid, hostname);
   WiFi.mode(WIFI_STA);
-  WiFi.setHostname(hostname);
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  //WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
+  WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
     Serial.print(".");
+    delay(500);
   }
 
   Serial.println(WiFi.localIP());
@@ -108,11 +88,31 @@ void publish_sensor() {
 }
 
 void setup_sensor() {
-  if (!bme.begin(0x77)) {
-    Serial.println("Could not find a valid BME280 sensor ...");
+  if (!bme.begin()) {
+    Serial.println("Could not find a BME280 sensor ...");
     while (1)
       ;
   }
+}
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial);   
+
+  setup_sensor();
+
+  create_hostname();
+
+  setup_wifi();
+
+  setup_mqtt();
+
+  publish_sensor();
+
+  delay(1000); // wait for mqtt message to be sent
+  
+  Serial.println("going into deep sleep");
+  ESP.deepSleep(INTERVAL * 1000000);
 }
 
 void loop() {
