@@ -79,9 +79,13 @@ void publish_sensor() {
   client.loop();
 
   float p25, p10;
-  if( !sds.read(&p25, &p10) ) {
-      publishf(location, room, "p10", p10);
-      publishf(location, room, "p25", p25);
+  for( int i=0; i<10; i++ ) {
+      sds.read(&p25, &p10);
+      if( p25 < 5000.0) {
+        publishf(location, room, "p10", p10);
+        publishf(location, room, "p25", p25);
+        return;
+      }
   }
 }
 

@@ -95,7 +95,7 @@ void SDS011::read10() {
 void SDS011::read10(uint8_t *response) {
     for (uint8_t i = 0; i < 10; i++ ) {
 		response[i] = sds_data->read();
-        Serial.println(response[i], HEX);
+        //Serial.println(response[i], HEX);
     }
 
     int checksum = 0;

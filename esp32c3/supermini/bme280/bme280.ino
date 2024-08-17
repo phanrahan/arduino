@@ -17,8 +17,9 @@ PubSubClient client(espClient);
 #define INTERVAL 10*60
 
 char *location = "minoca";
-//char *room = "studio";
-char *room = "bedroom";
+char *room = "studio";
+//char *room = "bedroom";
+//char *room = "shop";
 
 Adafruit_BME280 bme;  // I2C
 
