@@ -32,9 +32,9 @@ void setup_wifi() {
   Serial.printf("Connecting to %s as %s\n", ssid, hostname);
   WiFi.mode(WIFI_STA);
   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
-  //WiFi.setHostname(hostname);
+  WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
-  WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  //WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
@@ -82,9 +82,6 @@ void publish_sensor() {
   float pressure = bmp.readPressure();
   pressure /= 100.0;
   publishf(location, room, "pressure", pressure);
-
-  //float humidity = bmp.readHumidity();
-  //publishf(location, room, "humidity", humidity);
 }
 
 void setup_sensor() {
