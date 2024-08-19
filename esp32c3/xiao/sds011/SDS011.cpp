@@ -14,6 +14,15 @@ static constexpr uint8_t WAKEUP_CMD[19] = {
 static constexpr uint8_t VERSION_CMD[] PROGMEM = {
 	0xAA, 0xB4, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x05, 0xAB
 };
+
+static constexpr uint8_t GET_MODE_CMD[] PROGMEM = {
+	0xAA, 0xB4, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0xAB
+};
+
+static constexpr uint8_t SET_QUERY_MODE_CMD[] PROGMEM = {
+	0xAA, 0xB4, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0xAB
+};
+
 static constexpr uint8_t CONTINUOUS_MODE_CMD[] PROGMEM = {
 	0xAA, 0xB4, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x07, 0xAB
 };
@@ -60,6 +69,25 @@ void SDS011::wakeup() {
 }
 
 // --------------------------------------------------------
+// SDS011:get_mode (active or query)
+// --------------------------------------------------------
+int SDS011::get_mode() {
+    uint8_t response[10];
+    write19(GET_MODE_CMD);
+    read10(response);
+    return response[4];
+}
+
+// --------------------------------------------------------
+// SDS011:set_query_mode 
+// --------------------------------------------------------
+void SDS011::set_query_mode() {
+    write19(SET_QUERY_MODE_CMD);
+    read10();
+}
+
+
+// --------------------------------------------------------
 // SDS011:continuous_mode
 // --------------------------------------------------------
 void SDS011::continuous_mode() {
@@ -80,27 +108,31 @@ void SDS011::begin(HardwareSerial* serial, int8_t rxPin, int8_t txPin) {
 }
 
 void SDS011::write19(const uint8_t *command) {
-	for (uint8_t i = 0; i < 19; i++) {
+	for (int i = 0; i < 19; i++) {
 		sds_data->write(command[i]);
 	}
 	sds_data->flush();
 }
 
-void SDS011::read10() {
-	for (uint8_t i = 0; i < 10; i++) {
-		sds_data->read();
-	}
+int SDS011::read10() {
+    uint8_t response[10];
+    return read10(response);
 }
 
-void SDS011::read10(uint8_t *response) {
-    for (uint8_t i = 0; i < 10; i++ ) {
+int SDS011::read10(uint8_t *response) {
+	for (int i = 0; i < 10; i++) {
 		response[i] = sds_data->read();
-        //Serial.println(response[i], HEX);
-    }
+	}
+    uint8_t checksum = crc(response);
+    //Serial.printf("checksum %2x %2x\n", response[8], checksum);
+    return response[8] == checksum;
+}
 
-    int checksum = 0;
-    for (uint8_t i = 2; i < 8; i++ ) {
+uint8_t SDS011::crc(uint8_t *response)
+{
+    uint8_t checksum = 0;
+    for (int i = 2; i < 8; i++ ) {
         checksum += response[i];
     }
-    Serial.printf("checkum %2x %2x\n", response[8], checksum % 0xff);
+    return checksum;
 }

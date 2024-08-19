@@ -16,9 +16,12 @@ class SDS011 {
 		void sleep();
 		void wakeup();
 		void continuous_mode();
+		int get_mode();
+		void set_query_mode();
 		void write19(const uint8_t *command);
-		void read10();
-		void read10(uint8_t *response);
+		int read10(uint8_t *response);
+		int read10();
+		uint8_t crc(uint8_t *response);
 	private:
 		Stream *sds_data;
 };

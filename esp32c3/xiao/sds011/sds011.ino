@@ -35,9 +35,9 @@ void setup_wifi() {
   Serial.printf("\nConnecting to %s as %s\n", ssid, hostname);
   WiFi.mode(WIFI_STA);
   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
-  //WiFi.setHostname(hostname);
+  WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
-  WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  //WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -91,6 +91,10 @@ void publish_sensor() {
 
 void setup_sensor() {
   sds.begin(&uart0);
+  sds.wakeup();
+  delay(15000);
+  sds.set_query_mode();
+  Serial.printf("sds mode %d\n", sds.get_mode());
 }
 
 void setup() {
@@ -106,6 +110,7 @@ void setup() {
   setup_mqtt();
 
   publish_sensor();
+  sds.sleep();
 
   delay(1000); // wait for mqtt message to be sent
   
