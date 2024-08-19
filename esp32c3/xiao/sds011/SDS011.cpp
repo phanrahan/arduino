@@ -37,18 +37,18 @@ SDS011::SDS011(void) {
 int SDS011::read(float *p25, float *p10) {
 	int pm10_serial = 0;
 	int pm25_serial = 0;
-    uint8_t response[10];
+  uint8_t response[10];
 
-    write19(QUERY_CMD);
-    read10(response);
-
+  write19(QUERY_CMD);
+  int ok = read10(response);
+  if( ok ) {
     pm25_serial = response[2] + (response[3] << 8);
     pm10_serial = response[4] + (response[5] << 8);
 
     *p10 = (float)pm10_serial/10.0;
     *p25 = (float)pm25_serial/10.0;
-
-	return 0; // need to perform checksum and other error checking
+  }
+	return ok; // need to perform checksum and other error checking
 }
 
 // --------------------------------------------------------
@@ -124,7 +124,7 @@ int SDS011::read10(uint8_t *response) {
 		response[i] = sds_data->read();
 	}
     uint8_t checksum = crc(response);
-    //Serial.printf("checksum %2x %2x\n", response[8], checksum);
+    Serial.printf("checksum %2x %2x\n", response[8], checksum);
     return response[8] == checksum;
 }
 
