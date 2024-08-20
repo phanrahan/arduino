@@ -86,7 +86,7 @@ void publish_sensor() {
 
   ds2423.update();
   if (ds2423.isError()) {
-     Serial.println("Error reading counter");
+    Serial.println("Error reading counter");
   } else {
     int count = ds2423.getCount(DS2423_COUNTER_B);
     Serial.printf("Count = %d\n", count);
