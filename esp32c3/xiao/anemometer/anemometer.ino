@@ -26,8 +26,10 @@
 // define the Arduino digital I/O pin to be used for the 1-Wire network here
 const uint8_t ONE_WIRE_PIN = 10;
 
-// define the 1-Wire address of the DS2423 counter here
-uint8_t DS2423_address[] = { 0x1D, 0xD0, 0xE6, 0x0D, 0x00, 0x00, 0x00, 0xDC };
+// 1-Wire address of the DS2423 counter in the rain gauge
+// uint8_t DS2423_address[] = { 0x1D, 0xD0, 0xE6, 0x0D, 0x00, 0x00, 0x00, 0xDC };
+// 1-Wire address of the DS2423 counter in the anemometer
+uint8_t DS2423_address[] = { 0x1D, 0x59, 0xEA, 0x0D, 0x00, 0x00, 0x00, 0x81 };
 
 OneWire ow(ONE_WIRE_PIN);
 DS2423 ds2423(&ow, DS2423_address);
