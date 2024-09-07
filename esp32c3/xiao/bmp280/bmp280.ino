@@ -14,12 +14,12 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // 10 m
-#define INTERVAL 10*60
+#define INTERVAL  10*60
 
 char *location = "minoca";
 //char *room = "studio";
 //char *room = "bedroom";
-char *room = "outside";
+char *room = "patio";
 
 Adafruit_BMP280 bmp;  // I2C
 
@@ -105,12 +105,12 @@ void setup() {
 
   setup_mqtt();
 
-  publish_sensor();
 
+  publish_sensor();
   delay(1000); // wait for mqtt message to be sent
   
   Serial.println("going into deep sleep");
-  ESP.deepSleep(INTERVAL * 1000000);
+  ESP.deepSleep(INTERVAL * 1000000UL);
 }
 
 void loop() {

@@ -137,7 +137,7 @@ void setup() {
   delay(1000); // wait for mqtt message to be sent
   
   Serial.println("going into deep sleep");
-  ESP.deepSleep(INTERVAL * 1000000);
+  ESP.deepSleep(INTERVAL * 1000000UL);
 }
 
 void loop() {
