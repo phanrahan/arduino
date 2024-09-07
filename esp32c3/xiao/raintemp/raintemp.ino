@@ -1,6 +1,8 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include <Adafruit_BMP280.h>
+#include <OneWire.h>
+#include <DS2423.h>
+#include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
 
 const char* ssid = "Wifihill";
@@ -19,9 +21,19 @@ PubSubClient client(espClient);
 char *location = "minoca";
 //char *room = "studio";
 //char *room = "bedroom";
-char *room = "outside";
+//char *room = "shop";
+char *room = "roof";
 
-Adafruit_BMP280 bmp;  // I2C
+// define the Arduino digital I/O pin to be used for the 1-Wire network here
+const uint8_t ONE_WIRE_PIN = 10;
+
+// define the 1-Wire address of the DS2423 rain gauge counter
+uint8_t DS2423_address[] = { 0x1D, 0xD0, 0xE6, 0x0D, 0x00, 0x00, 0x00, 0xDC };
+
+OneWire ow(ONE_WIRE_PIN);
+DS2423 ds2423(&ow, DS2423_address);
+
+Adafruit_BME280 bme;  // I2C
 
 void create_hostname() {
   byte mac[6];
@@ -76,18 +88,33 @@ void publish_sensor() {
   connect_mqtt();
   client.loop();
 
-  float temperature = bmp.readTemperature();
+  ds2423.update();
+  if (ds2423.isError()) {
+    Serial.println("Error reading counter");
+  } else {
+    int count = ds2423.getCount(DS2423_COUNTER_B);
+    Serial.printf("Count = %d\n", count);
+    publishf(location, room, "rain", count/100.0);
+  }
+
+    float temperature = bme.readTemperature();
   temperature = 1.8 * temperature + 32;  // Temperature in Fahrenheit
   publishf(location, room, "temperature", temperature);
 
-  float pressure = bmp.readPressure();
+  float pressure = bme.readPressure();
   pressure /= 100.0;
   publishf(location, room, "pressure", pressure);
+
+  float humidity = bme.readHumidity();
+  publishf(location, room, "humidity", humidity);
+
 }
 
 void setup_sensor() {
-  if (!bmp.begin()) {
-    Serial.println("Could not find a BMP280 sensor ...");
+  ds2423.begin(DS2423_COUNTER_B);
+
+  if (!bme.begin()) {
+    Serial.println("Could not find a BME280 sensor ...");
     while (1)
       ;
   }
