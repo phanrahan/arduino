@@ -19,7 +19,7 @@ PubSubClient client(espClient);
 char *location = "minoca";
 //char *room = "studio";
 //char *room = "bedroom";
-char *room = "patio";
+char *room = "studio";
 
 Adafruit_BMP280 bmp;  // I2C
 
