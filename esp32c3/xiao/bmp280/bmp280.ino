@@ -19,7 +19,7 @@ PubSubClient client(espClient);
 char *location = "minoca";
 //char *room = "studio";
 //char *room = "bedroom";
-char *room = "studio";
+char *room = "studio-2";
 
 Adafruit_BMP280 bmp;  // I2C
 
@@ -86,7 +86,7 @@ void publish_sensor() {
 }
 
 void setup_sensor() {
-  if (!bmp.begin()) {
+  if (!bmp.begin(0x76)) {
     Serial.println("Could not find a BMP280 sensor ...");
     while (1)
       ;
