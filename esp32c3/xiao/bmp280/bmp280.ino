@@ -17,11 +17,21 @@ PubSubClient client(espClient);
 #define INTERVAL  10*60
 
 char *location = "minoca";
-//char *room = "studio";
+
+// Adafruit blue BMP280
 //char *room = "bedroom";
-char *room = "studio-2";
+char *room = "studio-1";
+// Generic purple BMP280
+//char *room = "studio-2";
+//char *room = "studio-3";
 
 Adafruit_BMP280 bmp;  // I2C
+
+// Generic purple BMP280
+//#define BMP_I2C_ADDR 0x76
+
+// Adafruit blue BMP280
+#define BMP_I2C_ADDR 0x77
 
 void create_hostname() {
   byte mac[6];
@@ -86,7 +96,7 @@ void publish_sensor() {
 }
 
 void setup_sensor() {
-  if (!bmp.begin(0x76)) {
+  if (!bmp.begin(BMP_I2C_ADDR)) {
     Serial.println("Could not find a BMP280 sensor ...");
     while (1)
       ;
