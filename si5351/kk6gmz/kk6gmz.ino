@@ -149,7 +149,7 @@ void setup() {
   Serial.println("Si5351 beacon initiated") ;
   si5351.init(SI5351_CRYSTAL_LOAD_8PF, 0, 0);
   si5351.drive_strength(SI5351_CLK0, SI5351_DRIVE_2MA);
-  si5351.set_correction(calvalue);
+  si5351.set_correction(calvalue, SI5351_PLL_INPUT_XO);
   si5351.output_enable(SI5351_CLK0, 0);
   si5351.set_freq(frequency, SI5351_CLK0);
   delay(2000);
