@@ -1,7 +1,9 @@
 #include <Encoder.h>
+
 #define A_PIN       6
 #define B_PIN       7
 Encoder knob(A_PIN, B_PIN);
+
 int lastposition = 0;
 
 #define BUTTON_PIN  8
