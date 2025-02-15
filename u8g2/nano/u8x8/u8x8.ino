@@ -8,6 +8,7 @@
 #include <wire.h>
 #endif
 
+//U8G2_SSD1305_128X32_NONAME_F_HW_I2C u8g2(U8G2_R0);
 U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C u8g2(U8G2_R0, A5,A4, U8X8_PIN_NONE);
 
 void setup() {
