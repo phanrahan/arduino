@@ -1,16 +1,16 @@
 //#include <Bounce2.h>
 #include <Encoder.h>
-#include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
-#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
+#include <Adafruit_GFX.h>     // Core graphics library
+#include <Adafruit_ST7735.h>  // Hardware-specific library for ST7735
+#include <Adafruit_ST7789.h>  // Hardware-specific library for ST7789
 #include <si5351.h>
 //#include <SPI.h>
 
-#define TFT_CS     10
-#define TFT_RST    9  
-#define TFT_DC     8
+#define TFT_CS 10
+#define TFT_RST 9
+#define TFT_DC 8
 
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS,  TFT_DC, TFT_RST);
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
 // Change these pin numbers to the pins connected to your encoder.
 //   Best Performance: both pins have interrupt capability
@@ -31,10 +31,9 @@ Si5351 si5351;
 long freq = 5000000;
 long dfreq = 100000;
 
-void setFrequency()
-{
+void setFrequency() {
   si5351.set_freq(freq, SI5351_CLK0);
-  
+
   tft.fillScreen(ST77XX_BLACK);
   tft.setCursor(0, 0);
   tft.setTextColor(ST77XX_WHITE);
@@ -51,7 +50,7 @@ void setup() {
   decrbutton.attach(decrPin);
   decrbutton.interval(10);
   */
-  
+
   lastpos = knob.read();
 
   tft.initR(INITR_BLACKTAB);
@@ -62,7 +61,7 @@ void setup() {
   si5351.drive_strength(SI5351_CLK0, SI5351_DRIVE_2MA);
   //si5351.set_correction(calvalue);
   si5351.output_enable(SI5351_CLK0, 0);
-    
+
   setFrequency();
 }
 
@@ -102,11 +101,11 @@ void loop() {
     }
   }
   */
- 
+
   int pos = knob.read();
-  if( pos != lastpos ) {
-     freq += (pos - lastpos) * dfreq;
-     lastpos = pos;
-     setFrequency();
-  } 
+  if (pos != lastpos) {
+    freq += (pos - lastpos) * dfreq;
+    lastpos = pos;
+    setFrequency();
+  }
 }
