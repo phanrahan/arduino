@@ -29,7 +29,7 @@ void display_frequency(long freq)
 }
 
 void setFrequency() {
-  si5351.set_freq(freq, SI5351_CLK0);
+  si5351.set_freq(100*freq, SI5351_CLK0);
   display_frequency(freq);
 }
 
@@ -38,7 +38,7 @@ void setup() {
 
   u8g2.begin();
 
-  si5351.init(SI5351_CRYSTAL_LOAD_8PF, 0, 0);
+  si5351.init(SI5351_CRYSTAL_LOAD_8PF, 0, calvalue);
   si5351.drive_strength(SI5351_CLK0, SI5351_DRIVE_2MA);
   si5351.output_enable(SI5351_CLK0, 0);
 
