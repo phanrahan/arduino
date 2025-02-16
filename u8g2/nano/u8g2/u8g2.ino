@@ -1,15 +1,6 @@
-#include <Arduino.h>
 #include <U8g2lib.h>
 
-#ifdef UX8xX8_HAVE_HW_SPI
-#include <SPI.h>
-#endif
-#ifdef UX8xX8_HAVE_HW_I2C
-#include <wire.h>
-#endif
-
-//U8G2_SSD1305_128X32_NONAME_F_HW_I2C u8g2(U8G2_R0);
-U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C u8g2(U8G2_R0, A5,A4, U8X8_PIN_NONE);
+U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 
 void setup() {
     u8g2.begin();
