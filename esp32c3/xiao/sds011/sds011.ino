@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include <HardwareSerial.h>
 #include <SDS011.h>
+#include <Adafruit_BMP280.h>
 
 const char* ssid = "Wifihill";
 const char* password = "Wifihill";
@@ -24,6 +25,14 @@ char *room = "shop";
 HardwareSerial uart0(0);
 
 SDS011 sds;
+
+Adafruit_BMP280 bmp;  // I2C
+
+// Generic purple BMP280
+#define BMP_I2C_ADDR 0x76
+
+// Adafruit blue BMP280
+//#define BMP_I2C_ADDR 0x77
 
 void create_hostname() {
   byte mac[6];
@@ -78,6 +87,15 @@ void publish_sensor() {
   connect_mqtt();
   client.loop();
 
+
+  float temperature = bmp.readTemperature();
+  temperature = 1.8 * temperature + 32;  // Temperature in Fahrenheit
+  publishf(location, room, "temperature", temperature);
+
+  float pressure = bmp.readPressure();
+  pressure /= 100.0;
+  publishf(location, room, "pressure", pressure);
+
   float p25, p10;
   for( int i=0; i<100; i++ ) {
       if( sds.read(&p25, &p10) ) {
@@ -95,6 +113,12 @@ void setup_sensor() {
   delay(15000);
   sds.set_query_mode();
   Serial.printf("sds mode %d\n", sds.get_mode());
+
+  if (!bmp.begin(BMP_I2C_ADDR)) {
+    Serial.println("Could not find a BMP280 sensor ...");
+    while (1)
+      ;
+  }
 }
 
 void setup() {
