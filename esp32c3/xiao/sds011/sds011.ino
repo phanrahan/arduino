@@ -16,11 +16,13 @@ PubSubClient client(espClient);
 
 // 10 m
 #define INTERVAL 10*60
+//#define INTERVAL 2*60
+//#define INTERVAL 30
 
-char *location = "minoca";
+char* location = "minoca";
 //char *room = "studio";
 //char *room = "bedroom";
-char *room = "shop";
+char* room = "shop";
 
 HardwareSerial uart0(0);
 
@@ -46,7 +48,7 @@ void setup_wifi() {
   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
   WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
-  //WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -74,7 +76,7 @@ void connect_mqtt() {
   }
 }
 
-void publishf(char* location, char *room, char *sensor, float value) {
+void publishf(char* location, char* room, char* sensor, float value) {
   char topic[100];
   char buf[8];
   dtostrf(value, 1, 2, buf);
@@ -97,13 +99,13 @@ void publish_sensor() {
   publishf(location, room, "pressure", pressure);
 
   float p25, p10;
-  for( int i=0; i<100; i++ ) {
-      if( sds.read(&p25, &p10) ) {
-        publishf(location, room, "p10", p10);
-        publishf(location, room, "p25", p25);
-        return;
-      }
-      delay(1000);
+  for (int i = 0; i < 100; i++) {
+    if (sds.read(&p25, &p10)) {
+      publishf(location, room, "p10", p10);
+      publishf(location, room, "p25", p25);
+      return;
+    }
+    delay(1000);
   }
 }
 
@@ -123,7 +125,8 @@ void setup_sensor() {
 
 void setup() {
   Serial.begin(115200);
-  while(!Serial) ;
+  while (!Serial)
+    ;
 
   setup_sensor();
 
@@ -137,10 +140,13 @@ void setup() {
   sds.sleep();
 
   delay(1000); // wait for mqtt message to be sent
-  
+
   Serial.println("going into deep sleep");
   ESP.deepSleep(INTERVAL * 1000000);
 }
 
 void loop() {
+  //publish_sensor();
+  //sds.sleep();
+  //sleep(30000);
 }

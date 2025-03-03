@@ -28,10 +28,10 @@ char *room = "studio-1";
 Adafruit_BMP280 bmp;  // I2C
 
 // Generic purple BMP280
-//#define BMP_I2C_ADDR 0x76
+#define BMP_I2C_ADDR 0x76
 
 // Adafruit blue BMP280
-#define BMP_I2C_ADDR 0x77
+//#define BMP_I2C_ADDR 0x77
 
 void create_hostname() {
   byte mac[6];
@@ -45,7 +45,7 @@ void setup_wifi() {
   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
   WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
-  //WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");

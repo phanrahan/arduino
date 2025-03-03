@@ -1,6 +1,6 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include <Adafruit_BME280.h>
+#include <Adafruit_BMP280.h>
 #include <Adafruit_Sensor.h>
 
 const char* ssid = "Wifihill";
@@ -14,14 +14,23 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // 10 m
-#define INTERVAL 10*60
+#define INTERVAL  10*60
 
 char *location = "minoca";
-char *room = "studio";
-//char *room = "bedroom";
-//char *room = "shop";
 
-Adafruit_BME280 bme;  // I2C
+//char *room = "bedroom";
+char *room = "studio-1";
+// Generic purple BMP280
+//char *room = "studio-2";
+//char *room = "studio-3";
+
+Adafruit_BMP280 bmp;  // I2C
+
+// Generic purple BMP280
+//#define BMP_I2C_ADDR 0x76
+
+// Adafruit blue BMP280
+#define BMP_I2C_ADDR 0x77
 
 void create_hostname() {
   byte mac[6];
@@ -76,21 +85,18 @@ void publish_sensor() {
   connect_mqtt();
   client.loop();
 
-  float temperature = bme.readTemperature();
+  float temperature = bmp.readTemperature();
   temperature = 1.8 * temperature + 32;  // Temperature in Fahrenheit
   publishf(location, room, "temperature", temperature);
 
-  float pressure = bme.readPressure();
+  float pressure = bmp.readPressure();
   pressure /= 100.0;
   publishf(location, room, "pressure", pressure);
-
-  float humidity = bme.readHumidity();
-  publishf(location, room, "humidity", humidity);
 }
 
 void setup_sensor() {
-  if (!bme.begin()) {
-    Serial.println("Could not find a BME280 sensor ...");
+  if (!bmp.begin(BMP_I2C_ADDR)) {
+    Serial.println("Could not find a BMP280 sensor ...");
     while (1)
       ;
   }
@@ -108,12 +114,12 @@ void setup() {
 
   setup_mqtt();
 
-  publish_sensor();
 
+  publish_sensor();
   delay(1000); // wait for mqtt message to be sent
   
   Serial.println("going into deep sleep");
-  ESP.deepSleep(INTERVAL * 1000000);
+  ESP.deepSleep(INTERVAL * 1000000UL);
 }
 
 void loop() {
