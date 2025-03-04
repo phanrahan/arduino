@@ -15,8 +15,8 @@ const char* mqtt_broker = "10.0.0.38";  // fiasco static ip
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// 10 m
-#define INTERVAL 10*60
+// 2 m
+#define INTERVAL 2*60
 
 char *location = "minoca";
 //char *room = "studio";
@@ -38,22 +38,24 @@ Adafruit_BME280 bme;  // I2C
 void create_hostname() {
   byte mac[6];
   WiFi.macAddress(mac);
+  Serial.printf("MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
+              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
   sprintf(hostname, "esp32c3-%02X%02X%02X", mac[3], mac[4], mac[5]);
 }
 
 void setup_wifi() {
-  Serial.printf("Connecting to %s as %s\n", ssid, hostname);
+  Serial.printf("Connecting to %s as %s", ssid, hostname);
   WiFi.mode(WIFI_STA);
   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
   WiFi.setHostname(hostname);
   WiFi.begin(ssid, password);
-  //WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
   }
-
+  Serial.print(" connected as ");
   Serial.println(WiFi.localIP());
 }
 
@@ -93,7 +95,7 @@ void publish_sensor() {
     Serial.println("Error reading counter");
   } else {
     int count = ds2423.getCount(DS2423_COUNTER_B);
-    Serial.printf("Count = %d\n", count);
+    //Serial.printf("Count = %d\n", count);
     publishf(location, room, "rain", count/100.0);
   }
 
@@ -122,7 +124,10 @@ void setup_sensor() {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial);   
+  while (!Serial)
+    ;   
+
+  Serial.println();
 
   setup_sensor();
 
