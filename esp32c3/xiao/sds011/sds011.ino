@@ -39,6 +39,8 @@ Adafruit_BMP280 bmp;  // I2C
 void create_hostname() {
   byte mac[6];
   WiFi.macAddress(mac);
+  Serial.printf("MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
+                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
   sprintf(hostname, "esp32c3-%02X%02X%02X", mac[3], mac[4], mac[5]);
 }
 
@@ -55,6 +57,7 @@ void setup_wifi() {
     Serial.print(".");
   }
 
+  Serial.print(" connected as ");
   Serial.println(WiFi.localIP());
 }
 
@@ -88,7 +91,6 @@ void publishf(char* location, char* room, char* sensor, float value) {
 void publish_sensor() {
   connect_mqtt();
   client.loop();
-
 
   float temperature = bmp.readTemperature();
   temperature = 1.8 * temperature + 32;  // Temperature in Fahrenheit
@@ -128,6 +130,8 @@ void setup() {
   while (!Serial)
     ;
 
+  Serial.println();
+
   setup_sensor();
 
   create_hostname();
@@ -146,7 +150,4 @@ void setup() {
 }
 
 void loop() {
-  //publish_sensor();
-  //sds.sleep();
-  //sleep(30000);
 }
